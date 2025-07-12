@@ -1,0 +1,2556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReminiHub Pro | AI-Powered 16K Photo Enhancement</title>
+    <meta name="description" content="The world's most advanced AI photo enhancer. Upscale to 16K resolution, perfect faces, and professional color grading with one click.">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="font" crossorigin>
+    
+    <!-- AI Model Preload -->
+    <link rel="preload" href="/ai-models/super-res.json" as="fetch" crossorigin>
+    
+    <!-- Progressive Web App -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#6C5CE7">
+    
+    <!-- Social Media Meta -->
+    <meta property="og:title" content="ReminiHub Pro - AI Photo Enhancer">
+    <meta property="og:description" content="Enhance photos to 16K resolution with AI">
+    <meta property="og:image" content="https://reminihub.com/social-preview.jpg">
+    
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --primary-dark: #5649C0;
+            --primary-light: #A29BFE;
+            --secondary: #FD79A8;
+            --accent: #00CEFF;
+            --dark: #1A1A2E;
+            --darker: #0F0F1A;
+            --light: #F5F6FA;
+            --lighter: #FFFFFF;
+            --gray: #6D6D7A;
+            --success: #00B894;
+            --warning: #FDCB6E;
+            --danger: #D63031;
+            --text: #2D3436;
+            --text-light: #636E72;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.15);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.2);
+            --shadow-xl: 0 20px 50px rgba(0,0,0,0.3);
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            --gradient-accent: linear-gradient(135deg, var(--accent), #0095FF);
+        }
+
+        /* Base Styles with Modern CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400 700;
+            font-display: swap;
+            src: url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--darker);
+            color: var(--lighter);
+            line-height: 1.6;
+            overscroll-behavior-y: none;
+            overflow-x: hidden;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Container with max-width and safe area padding */
+        .container {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 max(5vw, 20px);
+        }
+
+        /* Header with glass morphism effect */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(26, 26, 46, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 1000;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            padding: 10px 0;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--lighter);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon i {
+            font-size: 18px;
+            color: white;
+        }
+
+        /* Navigation with micro-interactions */
+        nav {
+            display: flex;
+            gap: 28px;
+        }
+
+        nav a {
+            position: relative;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            padding: 8px 0;
+        }
+
+        nav a:hover {
+            color: var(--lighter);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Auth buttons with hover effects */
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 92, 231, 0.5);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: var(--lighter);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Hero section with animated gradient */
+        .hero {
+            padding: 180px 0 100px;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(ellipse at top, var(--darker), transparent),
+                        radial-gradient(ellipse at bottom, rgba(108, 92, 231, 0.1), transparent);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 206, 255, 0.15) 0%, rgba(0, 206, 255, 0) 70%);
+            z-index: 0;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -20%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(253, 121, 168, 0.1) 0%, rgba(253, 121, 168, 0) 70%);
+            z-index: 0;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 5vw, 64px);
+            margin-bottom: 20px;
+            line-height: 1.2;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, #A29BFE);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: clamp(16px, 2vw, 20px);
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hero-btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 8px 30px rgba(108, 92, 231, 0.5);
+        }
+
+        .hero-btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(108, 92, 231, 0.6);
+        }
+
+        .hero-btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Premium Ad Space */
+        .premium-ad {
+            background: linear-gradient(135deg, #1A1A2E, #16213E);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 40px auto;
+            max-width: 800px;
+            border: 1px solid rgba(0, 206, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-ad::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                          rgba(0, 206, 255, 0.1) 0%, 
+                          rgba(108, 92, 231, 0.1) 50%, 
+                          rgba(253, 121, 168, 0.1) 100%);
+            z-index: 0;
+        }
+
+        .ad-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .ad-text {
+            flex: 1;
+        }
+
+        .ad-text h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        .ad-text p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .ad-btn {
+            padding: 10px 20px;
+            background: var(--gradient-accent);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .ad-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 206, 255, 0.4);
+        }
+
+        .ad-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            object-fit: cover;
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .ad-image {
+                display: block;
+            }
+        }
+
+        /* Upload Section with Glass Morphism */
+        .upload-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+            max-width: 1000px;
+            margin: 0 auto 60px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: rgba(0, 206, 255, 0.3);
+        }
+
+        .upload-container {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                          rgba(0, 206, 255, 0.05) 0%, 
+                          rgba(108, 92, 231, 0.05) 50%, 
+                          rgba(253, 121, 168, 0.05) 100%);
+            z-index: 0;
+        }
+
+        .upload-container:hover {
+            border-color: var(--accent);
+            background: rgba(0, 206, 255, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 60px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-text {
+            font-size: 22px;
+            color: var(--lighter);
+            margin-bottom: 10px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-subtext {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .or-divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .or-divider::before, .or-divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .or-divider::before {
+            margin-right: 20px;
+        }
+
+        .or-divider::after {
+            margin-left: 20px;
+        }
+
+        /* Sample Photos Grid */
+        .sample-photos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .sample-photo {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            aspect-ratio: 1;
+            border: 2px solid transparent;
+        }
+
+        .sample-photo:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent);
+            z-index: 2;
+        }
+
+        .sample-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .sample-photo:hover img {
+            transform: scale(1.1);
+        }
+
+        .sample-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            color: white;
+            padding: 10px;
+            font-size: 12px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sample-photo:hover .sample-label {
+            opacity: 1;
+        }
+
+        /* Preview Section with Advanced Features */
+        .preview-section {
+            display: none;
+            margin-top: 60px;
+            animation: fadeIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--lighter);
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+        }
+
+        .preview-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        /* Image Comparison Slider */
+        .image-comparison {
+            position: relative;
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            height: 60vh;
+            min-height: 500px;
+            max-height: 800px;
+        }
+
+        .comparison-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: var(--dark);
+            pointer-events: none;
+        }
+
+        #originalImage {
+            z-index: 1;
+            filter: grayscale(20%);
+        }
+
+        #enhancedImage {
+            z-index: 2;
+            width: 50%;
+            overflow: hidden;
+            border-right: 2px solid var(--accent);
+        }
+
+        .comparison-slider {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            cursor: ew-resize;
+        }
+
+        .comparison-slider::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 0 4px rgba(0, 206, 255, 0.3);
+        }
+
+        .comparison-slider i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 16px;
+        }
+
+        .resolution-badge {
+            position: absolute;
+            top: 20px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 4;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+
+        #originalResolution {
+            left: 20px;
+            border-left: 3px solid var(--danger);
+        }
+
+        #enhancedResolution {
+            right: 20px;
+            border-left: 3px solid var(--success);
+        }
+
+        /* Enhancement Controls with Tabs */
+        .enhancement-controls {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .controls-title {
+            font-size: 22px;
+            color: var(--lighter);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .controls-title i {
+            color: var(--accent);
+        }
+
+        .control-tabs {
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Control Groups with Modern Design */
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--lighter);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group-title i {
+            color: var(--accent);
+            font-size: 18px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .slider-label {
+            min-width: 120px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .slider:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 206, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .slider-value {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--accent);
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        /* Checkbox Group with Modern Toggle */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .checkbox-label {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .checkbox-label:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 206, 255, 0.3);
+        }
+
+        .checkbox-label input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: relative;
+            height: 20px;
+            width: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkbox-label input:checked ~ .checkmark {
+            background: var(--accent);
+        }
+
+        .checkmark::after {
+            content: '';
+            position: absolute;
+            display: none;
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-label input:checked ~ .checkmark::after {
+            display: block;
+        }
+
+        .checkbox-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* AI Presets */
+        .presets-group {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
+        }
+
+        .presets-group::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .presets-group::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .preset-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .preset-btn:hover {
+            background: rgba(0, 206, 255, 0.1);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .preset-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+        }
+
+        .enhance-btn {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 8px 25px rgba(108, 92, 231, 0.5);
+        }
+
+        .enhance-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(108, 92, 231, 0.6);
+        }
+
+        .enhance-btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .compare-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .compare-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Progress Bar with Animation */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 30px 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, 
+                          var(--primary) 0%, 
+                          var(--accent) 50%, 
+                          var(--secondary) 100%);
+            background-size: 200% 100%;
+            animation: progressGradient 3s ease infinite;
+            transition: width 0.3s ease;
+        }
+
+        @keyframes progressGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Result Actions */
+        .result-actions {
+            display: none;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .result-btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .download-btn {
+            background: var(--gradient-accent);
+            color: white;
+            box-shadow: 0 8px 25px rgba(0, 206, 255, 0.5);
+            border: none;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 206, 255, 0.6);
+        }
+
+        .new-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .new-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Responsive Ad Banner */
+        .ad-banner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 50px auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+
+        .ad-banner img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .ad-banner::after {
+            content: 'Advertisement';
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 100px 0;
+            background: linear-gradient(to bottom, var(--darker), #14142B);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .features-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.05)"/></svg>');
+            background-size: 20px 20px;
+            opacity: 0.3;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 40px 30px;
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 206, 255, 0.1) 0%, rgba(0, 206, 255, 0) 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+            border-color: rgba(0, 206, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+            color: var(--accent);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.2);
+        }
+
+        .feature-title {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--lighter);
+            font-weight: 600;
+        }
+
+        .feature-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 100px 0;
+            background: linear-gradient(to bottom, #14142B, var(--darker));
+            position: relative;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 40px 30px;
+            transition: all 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                          rgba(108, 92, 231, 0.1) 0%, 
+                          rgba(253, 121, 168, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-light);
+        }
+
+        .step:hover::before {
+            opacity: 1;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+        }
+
+        .step-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--lighter);
+            font-weight: 600;
+        }
+
+        .step-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: 100px 0;
+            background: linear-gradient(to bottom, var(--darker), #0F0F1A);
+            position: relative;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .testimonial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                          rgba(0, 206, 255, 0.1) 0%, 
+                          rgba(253, 121, 168, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--secondary);
+        }
+
+        .testimonial-card:hover::before {
+            opacity: 1;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 25px;
+            position: relative;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .testimonial-text::before {
+            content: '"';
+            font-size: 60px;
+            color: var(--accent);
+            position: absolute;
+            top: -30px;
+            left: -15px;
+            opacity: 0.2;
+            line-height: 1;
+            font-style: normal;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+        }
+
+        .author-info h4 {
+            font-size: 18px;
+            color: var(--lighter);
+            margin-bottom: 5px;
+        }
+
+        .author-info p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Footer */
+        footer {
+            background: #0F0F1A;
+            padding: 80px 0 30px;
+            position: relative;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .footer-col {
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--lighter);
+            margin-bottom: 20px;
+        }
+
+        .footer-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-logo-icon i {
+            font-size: 18px;
+            color: white;
+        }
+
+        .footer-about {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 25px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .footer-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--lighter);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-link {
+            margin-bottom: 15px;
+        }
+
+        .footer-link a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            display: inline-block;
+        }
+
+        .footer-link a:hover {
+            color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+        }
+
+        /* Notification System */
+        .notification {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-primary);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            box-shadow: var(--shadow-xl);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: bottom 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .notification.show {
+            bottom: 30px;
+        }
+
+        .notification-icon {
+            font-size: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .image-comparison {
+                height: 50vh;
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            nav {
+                display: none;
+            }
+            
+            .hero {
+                padding: 150px 0 80px;
+            }
+            
+            .image-comparison {
+                height: 40vh;
+                min-height: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 120px 0 60px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .upload-section {
+                padding: 30px 20px;
+            }
+            
+            .image-comparison {
+                height: 60vh;
+                min-height: 300px;
+            }
+            
+            .enhancement-controls {
+                padding: 25px 20px;
+            }
+            
+            .action-buttons, .result-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .feature-card, .step, .testimonial-card {
+                padding: 30px 20px;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark Mode Toggle (would need JS implementation) */
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            border: none;
+            color: white;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Glass Morphism Effect -->
+    <header id="mainHeader">
+        <div class="container header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <span>ReminiHub Pro</span>
+            </a>
+            
+            <nav>
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#testimonials">Testimonials</a>
+                <a href="/pricing">Pricing</a>
+            </nav>
+            
+            <div class="auth-buttons">
+                <a href="/login" class="btn btn-outline">Log In</a>
+                <a href="/signup" class="btn btn-primary">Get Pro</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section with Animated Background -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Next Generation AI Photo Enhancement</h1>
+            <p>Transform ordinary photos into extraordinary 16K masterpieces with our cutting-edge artificial intelligence technology.</p>
+            
+            <div class="hero-buttons">
+                <a href="#upload" class="hero-btn hero-btn-primary">
+                    <i class="fas fa-magic"></i> Enhance Photos Now
+                </a>
+                <a href="#how-it-works" class="hero-btn hero-btn-secondary">
+                    <i class="fas fa-play-circle"></i> See How It Works
+                </a>
+            </div>
+            
+            <!-- Premium Ad Space -->
+            <div class="premium-ad">
+                <div class="ad-content">
+                    <div class="ad-text">
+                        <h3>Try ReminiHub Pro Free for 7 Days</h3>
+                        <p>Unlock all premium features including 16K upscaling, batch processing, and priority support.</p>
+                        <a href="/signup" class="ad-btn">Start Free Trial</a>
+                    </div>
+                    <img src="https://via.placeholder.com/120" alt="Premium Features" class="ad-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Upload Section -->
+    <section id="upload" class="upload-section">
+        <div class="upload-container" id="uploadContainer">
+            <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <div class="upload-text">
+                Drag & Drop Your Photo Here
+            </div>
+            <div class="upload-subtext">
+                or click to browse files (JPG, PNG up to 50MB)
+            </div>
+            <input type="file" id="fileInput" class="file-input" accept="image/*">
+        </div>
+        
+        <div class="or-divider">
+            OR TRY WITH SAMPLE PHOTOS
+        </div>
+        
+        <div class="sample-photos">
+            <div class="sample-photo">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Portrait">
+                <div class="sample-label">Portrait</div>
+            </div>
+            <div class="sample-photo">
+                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Landscape">
+                <div class="sample-label">Landscape</div>
+            </div>
+            <div class="sample-photo">
+                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Fashion">
+                <div class="sample-label">Fashion</div>
+            </div>
+            <div class="sample-photo">
+                <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Old Photo">
+                <div class="sample-label">Old Photo</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Preview Section (Initially Hidden) -->
+    <section class="preview-section" id="previewSection">
+        <h2 class="section-title">AI Photo Enhancement Studio</h2>
+        
+        <div class="preview-container">
+            <!-- Image Comparison Slider -->
+            <div class="image-comparison" id="imageComparison">
+                <img id="originalImage" src="" alt="Original photo" class="comparison-image">
+                <img id="enhancedImage" src="" alt="Enhanced photo" class="comparison-image">
+                <div class="comparison-slider">
+                    <i class="fas fa-arrows-alt-h"></i>
+                </div>
+                <div class="resolution-badge" id="originalResolution">-</div>
+                <div class="resolution-badge" id="enhancedResolution">-</div>
+            </div>
+            
+            <!-- Enhancement Controls -->
+            <div class="enhancement-controls">
+                <div class="controls-header">
+                    <h3 class="controls-title">
+                        <i class="fas fa-sliders-h"></i>
+                        AI Enhancement Settings
+                    </h3>
+                    
+                    <div class="control-tabs">
+                        <button class="tab-btn active" data-tab="basic">Basic</button>
+                        <button class="tab-btn" data-tab="advanced">Advanced</button>
+                        <button class="tab-btn" data-tab="professional">Pro</button>
+                    </div>
+                </div>
+                
+                <!-- Basic Tab -->
+                <div class="tab-content active" id="basicTab">
+                    <div class="control-group">
+                        <h4 class="control-group-title">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                            Resolution Enhancement
+                        </h4>
+                        <div class="slider-container">
+                            <span class="slider-label">Upscale Factor</span>
+                            <input type="range" min="2" max="16" value="4" step="2" class="slider" id="resolutionSlider">
+                            <span class="slider-value" id="resolutionValue">4x</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4 class="control-group-title">
+                            <i class="fas fa-user"></i>
+                            Face Enhancement
+                        </h4>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="faceSmooth" checked>
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Smooth Skin</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="eyeEnhance" checked>
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Enhance Eyes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="teethWhiten">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Whiten Teeth</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4 class="control-group-title">
+                            <i class="fas fa-bolt"></i>
+                            AI Presets
+                        </h4>
+                        <div class="presets-group">
+                            <button class="preset-btn active">Portrait</button>
+                            <button class="preset-btn">Landscape</button>
+                            <button class="preset-btn">Fashion</button>
+                            <button class="preset-btn">Document</button>
+                            <button class="preset-btn">Artwork</button>
+                            <button class="preset-btn">Old Photo</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Advanced Tab -->
+                <div class="tab-content" id="advancedTab">
+                    <div class="control-group">
+                        <h4 class="control-group-title">
+                            <i class="fas fa-palette"></i>
+                            Color Grading
+                        </h4>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="autoColor" checked>
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Auto Color Correct</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="vibranceBoost">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Boost Vibrance</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="warmTone">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Warm Tone</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="coolTone">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Cool Tone</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4 class="control-group-title">
+                            <i class="fas fa-mountain"></i>
+                            Background Enhancement
+                        </h4>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="bgBlur">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Blur Background</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="bgDenoise">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Reduce Noise</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="bgSharpen">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Sharpen Details</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Professional Tab -->
+                <div class="tab-content" id="professionalTab">
+                    <div class="control-group">
+                        <h4 class="control-group-title">
+                            <i class="fas fa-sliders-h"></i>
+                            Professional Adjustments
+                        </h4>
+                        <div class="slider-container">
+                            <span class="slider-label">Sharpness</span>
+                            <input type="range" min="0" max="100" value="50" class="slider" id="sharpnessSlider">
+                            <span class="slider-value" id="sharpnessValue">50</span>
+                        </div>
+                        <div class="slider-container">
+                            <span class="slider-label">Noise Reduction</span>
+                            <input type="range" min="0" max="100" value="30" class="slider" id="noiseSlider">
+                            <span class="slider-value" id="noiseValue">30</span>
+                        </div>
+                        <div class="slider-container">
+                            <span class="slider-label">Color Temperature</span>
+                            <input type="range" min="-50" max="50" value="0" class="slider" id="tempSlider">
+                            <span class="slider-value" id="tempValue">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button id="enhanceBtn" class="action-btn enhance-btn">
+                        <i class="fas fa-magic"></i> Enhance Photo
+                    </button>
+                    <button id="compareBtn" class="action-btn compare-btn">
+                        <i class="fas fa-exchange-alt"></i> Compare
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Result Actions (Initially Hidden) -->
+            <div class="result-actions" id="resultActions">
+                <button id="downloadBtn" class="result-btn download-btn">
+                    <i class="fas fa-download"></i> Download HD Version
+                </button>
+                <button id="newPhotoBtn" class="result-btn new-btn">
+                    <i class="fas fa-plus"></i> New Photo
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Responsive Ad Banner -->
+    <div class="ad-banner">
+        <img src="https://via.placeholder.com/1200x300" alt="Advertisement">
+    </div>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <h2 class="section-title">Cutting-Edge AI Features</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                    <h3 class="feature-title">16K Super Resolution</h3>
+                    <p class="feature-desc">Our proprietary AI can upscale images up to 16K resolution while preserving perfect detail and clarity.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-astronaut"></i>
+                    </div>
+                    <h3 class="feature-title">Face Reconstruction</h3>
+                    <p class="feature-desc">Advanced facial recognition rebuilds missing details for perfect portraits every time.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3 class="feature-title">Smart Color Grading</h3>
+                    <p class="feature-desc">AI analyzes and applies professional color grading tailored to each image's content.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">Context-Aware AI</h3>
+                    <p class="feature-desc">Our neural networks understand image context for perfect enhancement of any subject.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3 class="feature-title">Photo Restoration</h3>
+                    <p class="feature-desc">Bring old, damaged photos back to life by removing scratches, noise, and artifacts.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3 class="feature-title">GPU Accelerated</h3>
+                    <p class="feature-desc">Lightning-fast processing powered by WebGL and GPU acceleration for instant results.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How ReminiHub Pro Works</h2>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Upload Your Photo</h3>
+                    <p class="step-desc">Simply drag and drop your photo or select from your device. We support all common image formats.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">AI Analyzes Content</h3>
+                    <p class="step-desc">Our neural networks detect faces, objects, and scene composition to apply perfect enhancements.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Download Stunning Result</h3>
+                    <p class="step-desc">Get your professionally enhanced photo in seconds, ready for print or digital use.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials-section">
+        <div class="container">
+            <h2 class="section-title">Trusted by Professionals</h2>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        ReminiHub Pro has revolutionized our photo restoration workflow. What used to take hours in Photoshop now takes seconds with better results.
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="David Chen" class="author-avatar">
+                        <div class="author-info">
+                            <h4>David Chen</h4>
+                            <p>Lead Photographer, National Geographic</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        The 16K upscaling is simply magical. We've used it to restore and enhance historical photos for museum exhibitions with incredible detail.
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah Johnson" class="author-avatar">
+                        <div class="author-info">
+                            <h4>Sarah Johnson</h4>
+                            <p>Curator, Smithsonian Institute</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        As a commercial photographer, ReminiHub Pro saves me hours of retouching. The face enhancement is better than anything I could do manually.
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Michael Rodriguez" class="author-avatar">
+                        <div class="author-info">
+                            <h4>Michael Rodriguez</h4>
+                            <p>Fashion Photographer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <div class="footer-logo-icon">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <span>ReminiHub Pro</span>
+                    </div>
+                    <p class="footer-about">
+                        The world's most advanced AI photo enhancement platform. Powered by cutting-edge neural networks and machine learning.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h3 class="footer-title">Product</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">Features</a></li>
+                        <li class="footer-link"><a href="#">Pricing</a></li>
+                        <li class="footer-link"><a href="#">Examples</a></li>
+                        <li class="footer-link"><a href="#">API</a></li>
+                        <li class="footer-link"><a href="#">Changelog</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3 class="footer-title">Company</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">About Us</a></li>
+                        <li class="footer-link"><a href="#">Careers</a></li>
+                        <li class="footer-link"><a href="#">Blog</a></li>
+                        <li class="footer-link"><a href="#">Press</a></li>
+                        <li class="footer-link"><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3 class="footer-title">Resources</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">Help Center</a></li>
+                        <li class="footer-link"><a href="#">Tutorials</a></li>
+                        <li class="footer-link"><a href="#">Community</a></li>
+                        <li class="footer-link"><a href="#">Privacy Policy</a></li>
+                        <li class="footer-link"><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                &copy; 2023 ReminiHub Pro. All rights reserved. Powered by cutting-edge AI technology.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification System -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle notification-icon"></i>
+        <span id="notificationText">Your photo has been enhanced successfully!</span>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" id="darkModeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Header scroll effect
+            const header = document.getElementById('mainHeader');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // DOM Elements
+            const uploadContainer = document.getElementById('uploadContainer');
+            const fileInput = document.getElementById('fileInput');
+            const previewSection = document.getElementById('previewSection');
+            const originalImage = document.getElementById('originalImage');
+            const enhancedImage = document.getElementById('enhancedImage');
+            const originalResolution = document.getElementById('originalResolution');
+            const enhancedResolution = document.getElementById('enhancedResolution');
+            const enhanceBtn = document.getElementById('enhanceBtn');
+            const compareBtn = document.getElementById('compareBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const resultActions = document.getElementById('resultActions');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const newPhotoBtn = document.getElementById('newPhotoBtn');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            const samplePhotos = document.querySelectorAll('.sample-photo');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const imageComparison = document.getElementById('imageComparison');
+            const comparisonSlider = document.querySelector('.comparison-slider');
+            
+            // Enhancement controls
+            const resolutionSlider = document.getElementById('resolutionSlider');
+            const resolutionValue = document.getElementById('resolutionValue');
+            const sharpnessSlider = document.getElementById('sharpnessSlider');
+            const sharpnessValue = document.getElementById('sharpnessValue');
+            const noiseSlider = document.getElementById('noiseSlider');
+            const noiseValue = document.getElementById('noiseValue');
+            const tempSlider = document.getElementById('tempSlider');
+            const tempValue = document.getElementById('tempValue');
+            
+            // Current image data
+            let currentImage = {
+                file: null,
+                originalWidth: 0,
+                originalHeight: 0,
+                enhancedWidth: 0,
+                enhancedHeight: 0,
+                settings: {
+                    resolution: 4,
+                    faceSmooth: true,
+                    eyeEnhance: true,
+                    teethWhiten: false,
+                    autoColor: true,
+                    vibranceBoost: false,
+                    warmTone: false,
+                    coolTone: false,
+                    bgBlur: false,
+                    bgDenoise: false,
+                    bgSharpen: false,
+                    sharpness: 50,
+                    noiseReduction: 30,
+                    colorTemp: 0
+                }
+            };
+            
+            // Initialize sliders
+            resolutionSlider.addEventListener('input', function() {
+                currentImage.settings.resolution = parseInt(this.value);
+                resolutionValue.textContent = `${this.value}x`;
+            });
+            
+            sharpnessSlider.addEventListener('input', function() {
+                currentImage.settings.sharpness = parseInt(this.value);
+                sharpnessValue.textContent = this.value;
+            });
+            
+            noiseSlider.addEventListener('input', function() {
+                currentImage.settings.noiseReduction = parseInt(this.value);
+                noiseValue.textContent = this.value;
+            });
+            
+            tempSlider.addEventListener('input', function() {
+                currentImage.settings.colorTemp = parseInt(this.value);
+                tempValue.textContent = this.value;
+            });
+            
+            // Tab switching
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    
+                    // Update active tab button
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding tab content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${tabId}Tab`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadContainer.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadContainer.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadContainer.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                uploadContainer.style.borderColor = 'var(--accent)';
+                uploadContainer.style.background = 'rgba(0, 206, 255, 0.1)';
+            }
+            
+            function unhighlight() {
+                uploadContainer.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                uploadContainer.style.background = 'rgba(255, 255, 255, 0.02)';
+            }
+            
+            // Handle dropped files
+            uploadContainer.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length) {
+                    handleFile(files[0]);
+                }
+            }
+            
+            // Handle file selection via click
+            uploadContainer.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files.length) {
+                    handleFile(this.files[0]);
+                }
+            });
+            
+            // Handle sample photos
+            samplePhotos.forEach(photo => {
+                photo.addEventListener('click', function() {
+                    const img = this.querySelector('img');
+                    loadSamplePhoto(img.src.replace('/200/', '/800/'));
+                });
+            });
+            
+            function loadSamplePhoto(url) {
+                // Show loading state
+                enhanceBtn.disabled = true;
+                enhanceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading sample...';
+                
+                // In a real app, you would fetch the sample image
+                setTimeout(() => {
+                    originalImage.src = url;
+                    
+                    // Set sample dimensions
+                    currentImage.originalWidth = 800;
+                    currentImage.originalHeight = 600;
+                    originalResolution.textContent = '800×600';
+                    
+                    // Show preview section
+                    previewSection.style.display = 'block';
+                    
+                    // Reset button
+                    enhanceBtn.disabled = false;
+                    enhanceBtn.innerHTML = '<i class="fas fa-magic"></i> Enhance Photo';
+                    
+                    // Scroll to preview
+                    previewSection.scrollIntoView({ behavior: 'smooth' });
+                }, 800);
+            }
+            
+            // Process selected file
+            function handleFile(file) {
+                if (!file.type.match('image.*')) {
+                    showNotification('Please select an image file (JPG, PNG)');
+                    return;
+                }
+                
+                if (file.size > 50 * 1024 * 1024) {
+                    showNotification('File size too large (max 50MB)');
+                    return;
+                }
+                
+                currentImage.file = file;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    originalImage.src = e.target.result;
+                    enhancedImage.src = e.target.result; // For demo purposes
+                    
+                    // Get image dimensions
+                    const img = new Image();
+                    img.onload = function() {
+                        currentImage.originalWidth = this.width;
+                        currentImage.originalHeight = this.height;
+                        originalResolution.textContent = `${this.width}×${this.height}`;
+                        
+                        // Calculate enhanced dimensions
+                        currentImage.enhancedWidth = this.width * currentImage.settings.resolution;
+                        currentImage.enhancedHeight = this.height * currentImage.settings.resolution;
+                        enhancedResolution.textContent = `${currentImage.enhancedWidth}×${currentImage.enhancedHeight}`;
+                    };
+                    img.src = e.target.result;
+                    
+                    // Show preview section
+                    previewSection.style.display = 'block';
+                    
+                    // Hide result actions if shown from previous photo
+                    resultActions.style.display = 'none';
+                    
+                    // Scroll to preview
+                    previewSection.scrollIntoView({ behavior: 'smooth' });
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Image comparison slider functionality
+            let isDragging = false;
+            
+            comparisonSlider.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                const rect = imageComparison.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                
+                // Keep within bounds
+                x = Math.max(0, Math.min(x, rect.width));
+                
+                const percent = (x / rect.width) * 100;
+                
+                enhancedImage.style.width = `${percent}%`;
+                comparisonSlider.style.left = `${percent}%`;
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+                document.body.style.cursor = '';
+            });
+            
+            // Touch support for comparison slider
+            comparisonSlider.addEventListener('touchstart', function(e) {
+                isDragging = true;
+                e.preventDefault();
+            });
+            
+            document.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                
+                const rect = imageComparison.getBoundingClientRect();
+                let x = e.touches[0].clientX - rect.left;
+                
+                // Keep within bounds
+                x = Math.max(0, Math.min(x, rect.width));
+                
+                const percent = (x / rect.width) * 100;
+                
+                enhancedImage.style.width = `${percent}%`;
+                comparisonSlider.style.left = `${percent}%`;
+            });
+            
+            document.addEventListener('touchend', function() {
+                isDragging = false;
+            });
+            
+            // Enhance button click
+            enhanceBtn.addEventListener('click', function() {
+                if (!originalImage.src || originalImage.src === '') {
+                    showNotification('Please select a photo first');
+                    return;
+                }
+                
+                // Show processing state
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                progressContainer.style.display = 'block';
+                
+                // Update settings from checkboxes
+                currentImage.settings.faceSmooth = document.getElementById('faceSmooth').checked;
+                currentImage.settings.eyeEnhance = document.getElementById('eyeEnhance').checked;
+                currentImage.settings.teethWhiten = document.getElementById('teethWhiten').checked;
+                currentImage.settings.autoColor = document.getElementById('autoColor').checked;
+                currentImage.settings.vibranceBoost = document.getElementById('vibranceBoost').checked;
+                currentImage.settings.warmTone = document.getElementById('warmTone').checked;
+                currentImage.settings.coolTone = document.getElementById('coolTone').checked;
+                currentImage.settings.bgBlur = document.getElementById('bgBlur').checked;
+                currentImage.settings.bgDenoise = document.getElementById('bgDenoise').checked;
+                currentImage.settings.bgSharpen = document.getElementById('bgSharpen').checked;
+                
+                // Simulate processing with progress updates
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5 + Math.random() * 15;
+                    if (progress > 100) progress = 100;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress === 100) {
+                        clearInterval(interval);
+                        processingComplete();
+                    }
+                }, 200);
+            });
+            
+            function processingComplete() {
+                // In a real app, this would come from your API
+                setTimeout(() => {
+                    // Calculate enhanced dimensions
+                    currentImage.enhancedWidth = currentImage.originalWidth * currentImage.settings.resolution;
+                    currentImage.enhancedHeight = currentImage.originalHeight * currentImage.settings.resolution;
+                    enhancedResolution.textContent = `${currentImage.enhancedWidth}×${currentImage.enhancedHeight}`;
+                    
+                    // Show result actions
+                    resultActions.style.display = 'flex';
+                    
+                    // Reset enhance button
+                    enhanceBtn.disabled = false;
+                    enhanceBtn.innerHTML = '<i class="fas fa-magic"></i> Enhance Again';
+                    
+                    // Show success notification
+                    showNotification('Photo enhanced successfully!');
+                    
+                    // In a real implementation, you would:
+                    // 1. Send the image to your backend API
+                    // 2. Process with AI models
+                    // 3. Receive the enhanced image
+                    // 4. Update the enhancedImage.src with the result
+                }, 500);
+            }
+            
+            // Compare button
+            compareBtn.addEventListener('click', function() {
+                if (enhancedImage.style.width === '50%') {
+                    enhancedImage.style.width = '100%';
+                    this.innerHTML = '<i class="fas fa-exchange-alt"></i> Compare';
+                } else {
+                    enhancedImage.style.width = '50%';
+                    this.innerHTML = '<i class="fas fa-exchange-alt"></i> Side by Side';
+                }
+            });
+            
+            // Download button
+            downloadBtn.addEventListener('click', function() {
+                // In a real app, this would download the actual enhanced image from your server
+                const link = document.createElement('a');
+                link.href = enhancedImage.src;
+                link.download = `reminihub-enhanced-${Date.now()}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showNotification('Download started!');
+            });
+            
+            // New photo button
+            newPhotoBtn.addEventListener('click', function() {
+                // Reset the file input
+                fileInput.value = '';
+                
+                // Hide preview section
+                previewSection.style.display = 'none';
+                
+                // Reset comparison slider
+                enhancedImage.style.width = '50%';
+                
+                // Scroll to upload area
+                uploadContainer.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Show notification
+            function showNotification(message) {
+                notificationText.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Dark mode toggle (example - would need full implementation)
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            darkModeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('light-mode');
+                this.innerHTML = document.body.classList.contains('light-mode') ? 
+                    '<i class="fas fa-moon"></i>' : 
+                    '<i class="fas fa-sun"></i>';
+            });
+            
+            // Initialize AdSense (example)
+            if (typeof adsbygoogle !== 'undefined') {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            }
+            
+            // Service Worker Registration for PWA
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registration successful');
+                        })
+                        .catch(err => {
+                            console.log('ServiceWorker registration failed: ', err);
+                        });
+                });
+            }
+            
+            // Intersection Observer for animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.feature-card, .step, .testimonial-card').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
