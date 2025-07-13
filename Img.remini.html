@@ -2474,16 +2474,212 @@
             });
             
             // Download button
-            downloadBtn.addEventListener('click', function() {
-                // In a real app, this would download the actual enhanced image from your server
+            <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReminiHub Pro - Enhance & Download Photos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-button {
+            display: inline-block;
+            background-color: #ff6b6b;
+            color: white;
+            padding: 12px 30px;
+            margin: 20px 10px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .main-button:hover {
+            background-color: #ff5252;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .image-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        #enhancedImage {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .ad-container {
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">ReminiHub Pro</div>
+            <div class="tagline">Enhance & Download High Quality Photos</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- AdSense Ad -->
+        <div class="ad-container">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                crossorigin="anonymous"></script>
+            <!-- Homepage Banner Ad -->
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-app-pub-5520030237058441/1964476833"
+                data-ad-slot="ca-app-pub-5520030237058441/1964476833"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        
+        <div class="image-container">
+            <img id="enhancedImage" src="path/to/your/enhanced-image.jpg" alt="Enhanced Photo">
+            <div>
+                <button id="downloadBtn" class="main-button">Download Enhanced Image</button>
+                <a href="Tools/img.html" class="main-button">Enhance Another Photo</a>
+            </div>
+        </div>
+        
+        <!-- AdSense Ad -->
+        <div class="ad-container">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                crossorigin="anonymous"></script>
+            <!-- Homepage Bottom Ad -->
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-app-pub-5520030237058441/3495699282"
+                data-ad-slot="Xca-app-pub-5520030237058441/3495699282"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>© 2023 ReminiHub Pro. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- AdMob and Download Functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/cordova-admob@5.0.1/dist/admob.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cordova/9.0.0/cordova.min.js"></script>
+    <script>
+        // Initialize AdMob
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof admob !== 'undefined') {
+                admob.initialize({
+                    appId: 'ca-app-pub-5520030237058441~8978840697', // আপনার AdMob App ID দিয়ে রিপ্লেস করুন
+                    isTesting: true // প্রোডাকশনে এটি রিমুভ করুন
+                });
+            }
+            
+            // Download button functionality
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                if (typeof admob !== 'undefined') {
+                    // Show rewarded ad before download
+                    const rewardedAd = admob.rewarded.create({
+                        adUnitId: 'ca-app-pub-5520030237058441/3495699282' // আপনার AdMob Rewarded Ad Unit ID দিয়ে রিপ্লেস করুন
+                    });
+                    
+                    rewardedAd.load();
+                    
+                    rewardedAd.on('load', () => {
+                        rewardedAd.show();
+                    });
+                    
+                    rewardedAd.on('loadfail', () => {
+                        console.log('Ad failed to load, downloading directly');
+                        downloadImage();
+                    });
+                    
+                    rewardedAd.on('reward', () => {
+                        console.log('User earned reward, downloading image');
+                        downloadImage();
+                    });
+                } else {
+                    // If AdMob not available, download directly
+                    downloadImage();
+                }
+            });
+        });
+        
+        // Function to handle image download
+        function downloadImage() {
+            const enhancedImage = document.getElementById('enhancedImage');
+            if (enhancedImage && enhancedImage.src) {
                 const link = document.createElement('a');
                 link.href = enhancedImage.src;
                 link.download = `reminihub-enhanced-${Date.now()}.jpg`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                
-                showNotification('Download started!');
+            } else {
+                alert('Enhanced image not found! Please try enhancing again.');
+            }
+        }
+    </script>
+</body>
+</html>
             });
             
             // New photo button
